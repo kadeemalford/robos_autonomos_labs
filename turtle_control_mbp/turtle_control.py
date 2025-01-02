@@ -20,17 +20,17 @@ class TurtleControl(Node):
         self.goal_x = 0.0
         self.goal_y = 0.0
         self.goal_theta = 0.0
-        self.k_linear = 1.0
-        self.k_angular = 6.0
-        self.error_tolerance = 0.1
+        self.k_linear = 0.7
+        self.k_angular = 1.5
+        self.error_tolerance = 0.01
 
     def init_publisher(self):
         self.publisher = self.create_publisher(Twist, '/mbp/turtle1/cmd_vel', 10)
         self.timer = self.create_timer(0.1, self.pub_callback)
 
     def init_subscribers(self):
-        self.create_subscription(Pose, '/turtle1/pose', self.pose_callback, 10)
-        self.create_subscription(Pose2D, '/goal', self.goal_callback, 10)
+        self.create_subscription(Pose, '/mbp/turtle1/pose', self.pose_callback, 10)
+        self.create_subscription(Pose2D, '/mbp/goal', self.goal_callback, 10)
 
     def pose_callback(self, msg):
         self.x = msg.x
@@ -44,13 +44,14 @@ class TurtleControl(Node):
 
     def pub_callback(self):
         linear_error = math.sqrt((self.goal_x - self.x) ** 2 + (self.goal_y - self.y) ** 2)
-        angular_error = math.atan2(self.goal_y - self.y, self.goal_x - self.x) - self.theta
-        linear_velocity = self.k_linear * math.tanh(linear_error)
-        angular_velocity = self.k_angular * angular_error
-
+        angular_error =  math.atan2(self.goal_y - self.y, self.goal_x - self.x) - self.theta
+        
         if linear_error < self.error_tolerance:
             linear_velocity = 0.0
             angular_velocity = 0.0
+        else:
+            linear_velocity = self.k_linear * math.tanh(linear_error)
+            angular_velocity = self.k_angular * angular_error
 
         cmd = Twist()
         cmd.linear.x = linear_velocity
@@ -69,3 +70,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
