@@ -45,13 +45,14 @@ class TurtleControl(Node):
     def pub_callback(self):
         linear_error = math.sqrt((self.goal_x - self.x) ** 2 + (self.goal_y - self.y) ** 2)
         angular_error =  math.atan2(self.goal_y - self.y, self.goal_x - self.x) - self.theta
+        angular_error_normalized = (angular_error + math.pi) % (2 * math.pi) - math.pi  #normalizando o erro para ficar no intervalo [-pi,pi)
         
         if linear_error < self.error_tolerance:
             linear_velocity = 0.0
             angular_velocity = 0.0
         else:
             linear_velocity = self.k_linear * math.tanh(linear_error)
-            angular_velocity = self.k_angular * angular_error
+            angular_velocity = self.k_angular * angular_error_normalized
 
         cmd = Twist()
         cmd.linear.x = linear_velocity

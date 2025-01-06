@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'turtle_control = turtle_control_mbp.turtle_control:main',
+            'goal_manager = turtle_control_mbp.goal_manager:main',
         ],
     },
 )
